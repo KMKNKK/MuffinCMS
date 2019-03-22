@@ -9,4 +9,6 @@ module.exports = app => {
   router.post('/getVideoList', controller.getVideoList.get);
   router.post('/uploadVideo', controller.uploadVideo.upload);
   router.post('/deleteVideo', controller.deleteVideo.delete);
+  router.post('/modifyVideo/alterProportion', controller.modifyVideo.alterProportion);
+  router.post('/modifyVideo/mergeVideo', controller.modifyVideo.mergeVideo);
 };

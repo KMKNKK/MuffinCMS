@@ -11,9 +11,14 @@ const Controller = require('egg').Controller;
 
 class DeleteVideoController extends Controller {
 
+  /**
+   * @Des 删除视频文件
+   * @param {string} fileType 文件类别(所在文件夹)
+   * @param {string} fileName 文件名
+   */
   async delete() {
     const { ctx } = this;
-    const fileType = ctx.query.fileType;
+    const fileType = ctx.query.fileType || 'video/sports';
     const fileName = ctx.query.fileName;
 
     const target = path.join(this.config.baseDir, 'app/public', fileType, fileName);
