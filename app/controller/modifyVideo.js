@@ -11,6 +11,32 @@ const Controller = require('egg').Controller;
 
 class ModifyVideoController extends Controller {
 
+  /**
+   * @Des 获取视频对应地址
+   * @param {string} fileType 文件类别(所在文件夹)
+   * @param {string} fileName 文件名
+   * @return {string} 输出对应地址
+   */
+  getPath(fileType, fileName) {
+    const resultPath = path.join(this.config.baseDir, 'app/public', fileType, fileName);
+    return resultPath;
+  }
+
+  /**
+   * @Des 获取视频详细信息
+   * @param {string} path 视频地址
+   */
+  getDetail(path) {
+    // 查看视频信息
+    ffmpeg.ffprobe(path, (err, meta) => {
+      if (err) {
+        console.log(`get-${path}-msg-err`, err);
+      }
+      console.log('meta', meta);
+    });
+
+  }
+
   async transcoding() {
     // TODO 转码
   }
@@ -30,21 +56,15 @@ class ModifyVideoController extends Controller {
     const { ctx: { query } } = this;
     const { width, height, fileType = 'video/sports', fileName, outName } = query;
 
-    if (!width || !height) {
+    if (!width || !height || !fileName) {
       this.ctx.body = {
         err: 10002,
-        msg: 'fail: No width or height',
+        msg: 'fail: Missing params',
       };
     } else {
-      const targetPath = path.join(this.config.baseDir, 'app/public', fileType, fileName);
-      const outPath = outName ? path.join(this.config.baseDir, 'app/public', fileType, outName) : targetPath;
+      const targetPath = this.getPath(fileType, fileName);
+      const outPath = outName ? this.getPath(fileType, outName) : targetPath;
       const targetFile = ffmpeg(targetPath);
-
-      // 查看视频信息
-      // ffmpeg.ffprobe(outPath, (err, meta) => {
-      //   console.log('err', err);
-      //   console.log('meta', meta);
-      // });
 
       try {
         targetFile.withSize(`${width}x${height}`)
@@ -66,45 +86,41 @@ class ModifyVideoController extends Controller {
   }
 
   /**
-   * @Des 合并两个视频
+   * @Des 修改视频帧率
    * @param {string} fileType 文件类别(所在文件夹)
-   * @param {string} outName 输出视频名
-   * @param {string} videoOne 视频一
-   * @param {string} videoTwo 视频二
+   * @param {string} fileName 文件名
+   * @param {string} outName 输出视频名, 若没有则修改原视频
+   * @param {number} fps 视频速率
    */
-  async mergeVideo() {
+  async alterFPS() {
     const { ctx: { query } } = this;
-    const { videoOne, videoTwo, fileType = 'video/sports', outName } = query;
+    const { fps, fileName, fileType = 'video/sports', outName } = query;
 
-    // TODO: 功能实现，代码简化
-
-    if (!videoOne || !videoTwo || !outName) {
+    if (!fps || !outName || !fileName) {
       this.ctx.body = {
         err: 10002,
         msg: 'fail: Missing params',
       };
     } else {
-      const targetOne = path.join(this.config.baseDir, 'app/public', fileType, videoOne);
-      const targetTwo = path.join(this.config.baseDir, 'app/public', fileType, videoTwo);
-      const outPath = path.join(this.config.baseDir, 'app/public', fileType, outName);
-      const tempDir = path.join(this.config.baseDir, 'app/public', fileType, 'tempDir');
-      ffmpeg(targetOne).input(targetTwo).mergeToFile(outPath);
+      const targetPath = this.getPath(fileType, fileName);
+      const outPath = outName ? this.getPath(fileType, outName) : targetPath;
+      const targetFile = ffmpeg(targetPath);
+
       try {
-        ffmpeg(targetOne)
-          .input(targetTwo)
-          .on('error', function(err) {
-            console.log('An error occurred: ' + err.message);
-          })
+        targetFile.fps(fps)
+          .save(outPath)
           .on('end', function() {
-            console.log('Merging finished !');
+            console.log('file has been converted succesfully');
           })
-          .mergeToFile(outPath, tempDir);
+          .on('error', function(err) {
+            console.log('an error happened: ' + err.message);
+          });
       } catch (e) {
-        console.log('modifyVideo-mergeVideo-error', e);
+        console.log('modifyVideo-alterFPS-error', e);
       }
       this.ctx.body = {
         err: 10001,
-        msg: 'success merge video!',
+        msg: 'success alter FPS!',
       };
     }
   }
