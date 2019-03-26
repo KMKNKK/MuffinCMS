@@ -23,28 +23,6 @@ class ModifyVideoController extends Controller {
   }
 
   /**
-   * @Des 获取视频详细信息
-   * @param {string} path 视频地址
-   */
-  getDetail(path) {
-    // 查看视频信息
-    ffmpeg.ffprobe(path, (err, meta) => {
-      if (err) {
-        console.log(`get-${path}-msg-err`, err);
-      }
-      console.log('meta', meta);
-    });
-
-  }
-
-  async transcoding() {
-    // TODO 转码
-  }
-  async streamProcessing() {
-    // TODO 流处理
-  }
-
-  /**
    * @Des 修改视频宽高比
    * @param {string} fileType 文件类别(所在文件夹)
    * @param {string} fileName 文件名
@@ -70,7 +48,7 @@ class ModifyVideoController extends Controller {
         targetFile.withSize(`${width}x${height}`)
           .save(outPath)
           .on('end', function() {
-            console.log('file has been converted succesfully');
+            console.log('alterProportion succesfully');
           })
           .on('error', function(err) {
             console.log('an error happened: ' + err.message);
@@ -110,7 +88,7 @@ class ModifyVideoController extends Controller {
         targetFile.fps(fps)
           .save(outPath)
           .on('end', function() {
-            console.log('file has been converted succesfully');
+            console.log('alterFPS succesfully');
           })
           .on('error', function(err) {
             console.log('an error happened: ' + err.message);
@@ -121,6 +99,46 @@ class ModifyVideoController extends Controller {
       this.ctx.body = {
         err: 10001,
         msg: 'success alter FPS!',
+      };
+    }
+  }
+
+  /**
+   * @Des 压缩视频
+   * @param {string} fileType 文件类别(所在文件夹)
+   * @param {string} fileName 文件名
+   * @param {string} outName 输出视频名, 若没有则修改原视频
+   * @param {number} size 压缩比例
+   */
+  async compressionVideo() {
+    const { ctx: { query } } = this;
+    const { size, fileName, fileType = 'video/sports', outName } = query;
+
+    if (!size || !outName || !fileName) {
+      this.ctx.body = {
+        err: 10002,
+        msg: 'fail: Missing params',
+      };
+    } else {
+      const targetPath = this.getPath(fileType, fileName);
+      const outPath = outName ? this.getPath(fileType, outName) : targetPath;
+      const targetFile = ffmpeg(targetPath);
+
+      try {
+        targetFile.size(`${size}%`)
+          .save(outPath)
+          .on('end', function() {
+            console.log('compressionVideo succesfully');
+          })
+          .on('error', function(err) {
+            console.log('an error happened: ' + err.message);
+          });
+      } catch (e) {
+        console.log('modifyVideo-compressionVideo-error', e);
+      }
+      this.ctx.body = {
+        err: 10001,
+        msg: 'success compression video!',
       };
     }
   }

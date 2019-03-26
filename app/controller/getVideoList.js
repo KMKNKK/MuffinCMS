@@ -7,11 +7,24 @@
 
 const fs = require('fs');
 const path = require('path');
+const ffmpeg = require('fluent-ffmpeg');
 const Controller = require('egg').Controller;
 
 const fatherList = require('../constant/categories').videoCategory;
 
 class getVideoListController extends Controller {
+
+  /**
+   * @Des 获取视频对应地址
+   * @param {string} fileType 文件类别(所在文件夹)
+   * @param {string} fileName 文件名
+   * @return {string} 输出对应地址
+   */
+  getPath(fileType, fileName) {
+    const resultPath = path.join(this.config.baseDir, 'app/public', fileType, fileName);
+    return resultPath;
+  }
+
   async get() {
     const { ctx } = this;
     const dirPath = ctx.query.dirPath;
@@ -50,6 +63,42 @@ class getVideoListController extends Controller {
       }
     }
     ctx.body = body;
+  }
+
+  /**
+   * @Des 获取视频详细信息
+   * @param {string} fileType 文件类别(所在文件夹)
+   * @param {string} fileName 文件名
+   */
+  async getDetail() {
+    const { ctx: { query } } = this;
+    const { fileType = 'video/sports', fileName } = query;
+    if (!fileName) {
+      this.ctx.body = {
+        err: 10002,
+        msg: 'fail: Missing params',
+      };
+    } else {
+      const path = this.getPath(fileType, fileName);
+      // 查看视频信息
+
+      const Pro = new Promise((resolve, reject) => {
+        ffmpeg.ffprobe(path, (err, meta) => {
+          if (err) {
+            console.log(`get-${path}-msg-err`, err);
+            reject();
+          }
+          resolve(meta);
+        });
+      }).then(val => val);
+
+      const res = await Pro;
+
+      this.ctx.body = {
+        err: 10001,
+        msg: res,
+      };
+    }
   }
 }
 
