@@ -25,7 +25,7 @@ class getVideoListController extends Controller {
     return resultPath;
   }
 
-  async get() {
+  async getVideoList() {
     const { ctx } = this;
     const dirPath = ctx.query.dirPath;
     let body;
