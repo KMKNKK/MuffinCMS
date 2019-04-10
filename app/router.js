@@ -7,6 +7,7 @@ module.exports = app => {
   const { router, controller } = app;
   router.get('/', controller.home.index);
   router.get('/getVideoList/videoDetails', controller.getVideoList.getDetail);
+  router.get('/getVideoList/videoOccupancy', controller.getVideoList.getVideoOccupancy);
   router.get('/getVideoList', controller.getVideoList.getVideoList);
   router.post('/uploadVideo', controller.uploadVideo.upload);
   router.post('/deleteVideo', controller.deleteVideo.delete);

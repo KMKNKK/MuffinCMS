@@ -34,7 +34,10 @@ class getVideoListController extends Controller {
     if (dirPath === undefined) {
       if (!fatherList) {
         console.log('getVideoList-fatherList-err', fatherList);
-        body = 'fail: No fatherList';
+        body = {
+          err: 10002,
+          msg: 'fail: No fatherList'
+        };
       } else {
         const allVideo = {};
         let curTargetPath;
@@ -46,10 +49,16 @@ class getVideoListController extends Controller {
             allVideo[element] = curVideoList;
           } catch (err) {
             console.log(`getVideoList-${element}-err`, err);
-            body = `fail: get ${element}List error`;
+            body = {
+              err: 10002,
+              msg: `fail: get ${element}List error`
+            };
           }
         });
-        body = allVideo;
+        body = {
+          err: 10001,
+          msg: allVideo
+        };
       }
     } else {
       // 有query则按需返回对应分类的视频List
@@ -59,7 +68,10 @@ class getVideoListController extends Controller {
         body = videoList;
       } catch (err) {
         console.log(`getVideoList-${dirPath}-err`, err);
-        body = `fail: get ${dirPath}List error`;
+        body = {
+          err: 10002,
+          msg: `fail: get ${dirPath}List error`
+        };
       }
     }
     ctx.body = body;
@@ -99,6 +111,46 @@ class getVideoListController extends Controller {
         msg: res,
       };
     }
+  }
+
+  /**
+   * @Des 获取所有视频占的存储空间
+   */
+  async getVideoOccupancy() {
+    let body;
+    if (!fatherList) {
+      console.log('getVideoList-fatherList-err', fatherList);
+      body = {
+        err: 10002,
+        msg: 'fail: No fatherList'
+      };
+    } else {
+      let curTargetPath;
+      let curVideoList;
+      let curFilePath;
+      let count = 0;
+      fatherList.forEach(element => {
+        curTargetPath = path.join(this.config.baseDir, 'app/public/video', element);
+        try {
+          curVideoList = fs.readdirSync(curTargetPath);
+          curVideoList.forEach(val => {
+            curFilePath = path.join(curTargetPath, val);
+            count += fs.statSync(curFilePath).size;
+          })
+          body = {
+            err: 10001,
+            msg: Math.round(count / 1024 / 1024),
+          };
+        } catch (err) {
+          console.log(`getVideoOccupancy-${element}-err`, err);
+          body = {
+            err: 10002,
+            msg: `fail: get ${element}-countSize error`
+          };
+        }
+      });
+    }
+    this.ctx.body = body;
   }
 }
 
