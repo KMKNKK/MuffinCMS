@@ -25,10 +25,29 @@ class getVideoListController extends Controller {
     return resultPath;
   }
 
+  /**
+   * @Des 增加pv
+   */
+  addPV() {
+    const path = this.getPath('txt', 'pvCount.txt');
+    const buffer = fs.readFileSync(path);
+    const buffer2Obj = JSON.parse(buffer.toString());
+    const nowDate = new Date().toLocaleDateString();
+    if (buffer2Obj[nowDate] === undefined) {
+      buffer2Obj[nowDate] = 1;
+    } else {
+      buffer2Obj[nowDate] = buffer2Obj[nowDate] + 1;
+    }
+    fs.writeFileSync(path, JSON.stringify(buffer2Obj));
+  }
+
   async getVideoList() {
     const { ctx } = this;
     const dirPath = ctx.query.dirPath;
     let body;
+
+    // 统计此次访问的PV
+    this.addPV();
 
     // 若无query，则返回所有视频List
     if (dirPath === undefined) {
@@ -151,6 +170,24 @@ class getVideoListController extends Controller {
       });
     }
     this.ctx.body = body;
+  }
+
+   /**
+   * @Des 获取PV(页面访问次数)
+   */
+  async getPV() {
+    const path = this.getPath('txt', 'pvCount.txt');
+    const buffer = fs.readFileSync(path);
+    const buffer2Obj = JSON.parse(buffer.toString());
+    const obj2Arr = Object.keys(buffer2Obj);
+    let result = [];
+    for (let i = 6; i >= 0; i--) {
+      result.unshift(buffer2Obj[obj2Arr[i]])
+    }
+    this.ctx.body = {
+      err: 10001,
+      msg: result,
+    }
   }
 }
 
