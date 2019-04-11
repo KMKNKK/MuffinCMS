@@ -27,25 +27,24 @@ class ModifyVideoController extends Controller {
    * @param {string} fileType 文件类别(所在文件夹)
    * @param {string} fileName 文件名
    * @param {string} outName 输出视频名, 若没有则修改原视频
-   * @param {number} width 视频宽
-   * @param {number} height 视频高
+   * @param {string} heightWidth 视频宽高比
    */
   async alterProportion() {
     const { ctx: { query } } = this;
-    const { width, height, fileType = 'video/sports', fileName, outName } = query;
+    const { heightWidth, fileType = 'video/sports', fileName, outName } = query;
 
-    if (!width || !height || !fileName) {
+    if (!heightWidth || !fileName) {
       this.ctx.body = {
         err: 10002,
         msg: 'fail: Missing params',
       };
     } else {
       const targetPath = this.getPath(fileType, fileName);
-      const outPath = outName ? this.getPath(fileType, outName) : targetPath;
+      const outPath = outName ? this.getPath(fileType, outName) : this.getPath(fileType, '(1)' + fileName);
       const targetFile = ffmpeg(targetPath);
 
       try {
-        targetFile.withSize(`${width}x${height}`)
+        targetFile.withSize(`${heightWidth}`)
           .save(outPath)
           .on('end', function() {
             console.log('alterProportion succesfully');
@@ -74,14 +73,14 @@ class ModifyVideoController extends Controller {
     const { ctx: { query } } = this;
     const { fps, fileName, fileType = 'video/sports', outName } = query;
 
-    if (!fps || !outName || !fileName) {
+    if (!fps || !fileName) {
       this.ctx.body = {
         err: 10002,
         msg: 'fail: Missing params',
       };
     } else {
       const targetPath = this.getPath(fileType, fileName);
-      const outPath = outName ? this.getPath(fileType, outName) : targetPath;
+      const outPath = outName ? this.getPath(fileType, outName) : this.getPath(fileType, '(1)' + fileName);
       const targetFile = ffmpeg(targetPath);
 
       try {
@@ -114,14 +113,14 @@ class ModifyVideoController extends Controller {
     const { ctx: { query } } = this;
     const { size, fileName, fileType = 'video/sports', outName } = query;
 
-    if (!size || !outName || !fileName) {
+    if (!size || !fileName) {
       this.ctx.body = {
         err: 10002,
         msg: 'fail: Missing params',
       };
     } else {
       const targetPath = this.getPath(fileType, fileName);
-      const outPath = outName ? this.getPath(fileType, outName) : targetPath;
+      const outPath = outName ? this.getPath(fileType, outName) : this.getPath(fileType, '(1)' + fileName);
       const targetFile = ffmpeg(targetPath);
 
       try {
