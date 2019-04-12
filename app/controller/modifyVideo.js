@@ -43,22 +43,30 @@ class ModifyVideoController extends Controller {
       const outPath = outName ? this.getPath(fileType, outName) : this.getPath(fileType, '(1)' + fileName);
       const targetFile = ffmpeg(targetPath);
 
-      try {
+      await new Promise((resolve, reject) => {
         targetFile.withSize(`${heightWidth}`)
           .save(outPath)
           .on('end', function() {
-            console.log('alterProportion succesfully');
+            resolve();
           })
           .on('error', function(err) {
-            console.log('an error happened: ' + err.message);
+            reject(new Error(err));
           });
-      } catch (e) {
-        console.log('modifyVideo-alterProportion-error', e);
-      }
-      this.ctx.body = {
-        err: 10001,
-        msg: 'success alter proportion!',
-      };
+      })
+      .then(() => {
+        console.log('alterProportion succesfully')
+        this.ctx.body = {
+          err: 10001,
+          msg: 'success alter proportion!',
+        };
+      })
+      .catch(e => {
+        console.log('modifyVideo-alterProportion-error', e)
+        this.ctx.body = {
+          err: 10003,
+          msg: 'fail: ffmepg exited',
+        };
+      })
     }
   }
 
@@ -83,22 +91,30 @@ class ModifyVideoController extends Controller {
       const outPath = outName ? this.getPath(fileType, outName) : this.getPath(fileType, '(1)' + fileName);
       const targetFile = ffmpeg(targetPath);
 
-      try {
+      await new Promise((resolve, reject) => {
         targetFile.fps(fps)
           .save(outPath)
           .on('end', function() {
-            console.log('alterFPS succesfully');
+            resolve();
           })
           .on('error', function(err) {
-            console.log('an error happened: ' + err.message);
+            reject(new Error(err));
           });
-      } catch (e) {
-        console.log('modifyVideo-alterFPS-error', e);
-      }
-      this.ctx.body = {
-        err: 10001,
-        msg: 'success alter FPS!',
-      };
+      })
+      .then(() => {
+        console.log('alterFPS succesfully')
+        this.ctx.body = {
+          err: 10001,
+          msg: 'success alter FPS!',
+        };
+      })
+      .catch(e => {
+        console.log('modifyVideo-alterFPS-error', e)
+        this.ctx.body = {
+          err: 10003,
+          msg: 'fail: ffmepg exited',
+        };
+      })
     }
   }
 
@@ -123,22 +139,30 @@ class ModifyVideoController extends Controller {
       const outPath = outName ? this.getPath(fileType, outName) : this.getPath(fileType, '(1)' + fileName);
       const targetFile = ffmpeg(targetPath);
 
-      try {
+      await new Promise((resolve, reject) => {
         targetFile.size(`${size}%`)
           .save(outPath)
           .on('end', function() {
-            console.log('compressionVideo succesfully');
+            resolve();
           })
           .on('error', function(err) {
-            console.log('an error happened: ' + err.message);
+            reject(new Error(err));
           });
-      } catch (e) {
-        console.log('modifyVideo-compressionVideo-error', e);
-      }
-      this.ctx.body = {
-        err: 10001,
-        msg: 'success compression video!',
-      };
+      })
+      .then(() => {
+        console.log('success compression video!')
+        this.ctx.body = {
+          err: 10001,
+          msg: 'success compression video!',
+        };
+      })
+      .catch(e => {
+        console.log('modifyVideo-compressionVideo-error', e)
+        this.ctx.body = {
+          err: 10003,
+          msg: 'fail: ffmepg exited',
+        };
+      })
     }
   }
 }
