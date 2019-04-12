@@ -181,7 +181,7 @@ class getVideoListController extends Controller {
     const buffer2Obj = JSON.parse(buffer.toString());
     const obj2Arr = Object.keys(buffer2Obj);
     let result = [];
-    for (let i = 6; i >= 0; i--) {
+    for (let i = obj2Arr.length - 1, j = 0; j < 7; i--, j++) {
       result.unshift(buffer2Obj[obj2Arr[i]])
     }
     this.ctx.body = {
