@@ -84,7 +84,34 @@ class getVideoListController extends Controller {
       const targetPath = path.join(this.config.baseDir, 'app/public/video', dirPath);
       try {
         const videoList = fs.readdirSync(targetPath);
-        body = videoList;
+        let resultObj = {};
+        let promiseArr = [];
+        videoList.forEach(val => {
+          const videoPath = path.join(targetPath, val);
+          promiseArr.push(
+            new Promise((resolve, reject) => {
+              ffmpeg.ffprobe(videoPath, (err, meta) => {
+                if (err) {
+                  console.log(`get-${videoPath}-msg-err`, err);
+                  reject();
+                }
+                resolve(meta);
+              });
+            })
+            .then(meta => {
+              const stream = meta['streams'][0];
+              const format = meta['format'];
+              resultObj[val] = {
+                name: val,
+                heightWidth: `${stream.width}x${stream.height}`,
+                duration: Math.round(stream.duration),
+                size:  Math.round(format.size / 1024 / 1024)
+              }
+            })
+          )
+        })
+        await Promise.all(promiseArr);
+        body = resultObj;
       } catch (err) {
         console.log(`getVideoList-${dirPath}-err`, err);
         body = {
