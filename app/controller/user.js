@@ -4,8 +4,8 @@ const Controller = require('egg').Controller;
 
 class UserController extends Controller {
   async addItem() {
-    const { account, password } = this.ctx.query;
-    this.ctx.body = await this.ctx.service.user.create({ account, password });
+    const { account, password, auth } = this.ctx.query;
+    this.ctx.body = await this.ctx.service.user.create({ account, password, auth });
   }
   async selectItemById() {
     const { id } = this.ctx.query;
@@ -23,6 +23,7 @@ class UserController extends Controller {
       this.ctx.body = {
         err: 10001,
         msg: 'OK!',
+        auth: confirmResult.auth,
       }
     }
   }

@@ -6,7 +6,7 @@ class UserService extends Service {
       const item = await this.ctx.model.User.findById(id);
       return item;
     } catch(e) {
-      return e.errors[0].message;
+      return e;
     }
   }
   async create(values) {
@@ -14,7 +14,7 @@ class UserService extends Service {
       await this.ctx.model.User.create(values);
       return 'create OK!';
     } catch(e) {
-      return e.errors[0].message;
+      return e;
     }
   }
   async findOne(values) {
@@ -22,7 +22,7 @@ class UserService extends Service {
       const result = await this.ctx.model.User.findOne(values);
       return result;
     } catch(e) {
-      return e.errors[0].message;
+      return e;
     }
   }
 }

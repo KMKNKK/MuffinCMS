@@ -9,6 +9,7 @@ module.exports = app => {
     password: STRING(30),
     created_at: DATE,
     updated_at: DATE,
+    auth: STRING(30),
   });
 
   return User;
