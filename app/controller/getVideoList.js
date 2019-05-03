@@ -216,6 +216,49 @@ class getVideoListController extends Controller {
       msg: result,
     }
   }
+
+  /**
+   * @Des 检索视频
+   * @param {string} name 相关名称
+   */
+  async searchVideo() {
+    let body;
+    const { ctx: { query: { name } } } = this;
+    if (!fatherList) {
+      console.log('getVideoList-fatherList-err', fatherList);
+      body = {
+        err: 10002,
+        msg: 'fail: No fatherList'
+      };
+    } else {
+      let curTargetPath;
+      let curVideoList;
+      let resultList = [];
+      fatherList.forEach(element => {
+        curTargetPath = path.join(this.config.baseDir, 'app/public/video', element);
+        try {
+          curVideoList = fs.readdirSync(curTargetPath);
+          curVideoList.forEach(val => {
+            const reg = new RegExp(name, 'i');
+            if (reg.test(val)) {
+              resultList.push(val);
+            }
+          })
+          body = {
+            err: 10001,
+            msg: resultList,
+          };
+        } catch (err) {
+          console.log(`searchVideo-${name}-err`, err);
+          body = {
+            err: 10002,
+            msg: `fail: searchVideo ${name} error`
+          };
+        }
+      });
+    }
+    this.ctx.body = body;
+  }
 }
 
 module.exports = getVideoListController;

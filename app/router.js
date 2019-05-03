@@ -11,6 +11,7 @@ module.exports = app => {
   router.get('/getVideoList/videoOccupancy', controller.getVideoList.getVideoOccupancy);
   router.get('/getVideoList/getPV', controller.getVideoList.getPV);
   router.get('/getVideoList', controller.getVideoList.getVideoList);
+  router.get('/getVideoList/searchVideo', controller.getVideoList.searchVideo);
 
   router.post('/uploadVideo', controller.uploadVideo.upload);
   router.post('/deleteVideo', controller.deleteVideo.delete);
