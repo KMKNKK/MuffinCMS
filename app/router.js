@@ -23,4 +23,6 @@ module.exports = app => {
   router.post('/user/addItem', controller.user.addItem);
   router.post('/user/selectItemById', controller.user.selectItemById);
   router.post('/user/confirmAccount', controller.user.confirmAccount);
+  router.post('/user/changeUserAuth', controller.user.changeUserAuth);
+  router.get('/user/getUserList', controller.user.getUserList);
 };

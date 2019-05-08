@@ -27,6 +27,35 @@ class UserController extends Controller {
       }
     }
   }
+
+  async getUserList() {
+    const admin = await this.ctx.service.user.findAll({ where: { auth: 'admin' } });
+    const guest = await this.ctx.service.user.findAll({ where: { auth: 'guest' } });
+    this.ctx.body = {
+      err: 10001,
+      msg: {
+        admin,
+        guest,
+      },
+    }
+  }
+
+  async changeUserAuth() {
+    const { name, doWhat } = this.ctx.query;
+    if (doWhat === 'up') {
+      await this.ctx.service.user.update({auth: 'admin'}, { where: { account: name }});
+      this.ctx.body = {
+        err: 10001,
+        msg: 'OK!'
+      }
+    } else {
+      await this.ctx.service.user.update({auth: 'guest'}, { where: { account: name }});
+      this.ctx.body = {
+        err: 10001,
+        msg: 'OK!'
+      }
+    }
+  }
 }
 
 module.exports = UserController;

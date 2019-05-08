@@ -25,6 +25,22 @@ class UserService extends Service {
       return e;
     }
   }
+  async findAll(values) {
+    try {
+      const result = await this.ctx.model.User.findAll(values);
+      return result;
+    } catch(e) {
+      return e;
+    }
+  }
+  async update(values, options) {
+    try {
+      await this.ctx.model.User.update(values, options);
+      return result;
+    } catch(e) {
+      return e;
+    }
+  }
 }
 
 module.exports = UserService;
