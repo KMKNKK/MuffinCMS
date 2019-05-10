@@ -4,8 +4,8 @@ const Controller = require('egg').Controller;
 
 class UserController extends Controller {
   async addItem() {
-    const { account, password, auth } = this.ctx.query;
-    this.ctx.body = await this.ctx.service.user.create({ account, password, auth });
+    const { account, password, phoneNumber, auth } = this.ctx.query;
+    this.ctx.body = await this.ctx.service.user.create({ account, password, auth, 'phone_number': phoneNumber });
   }
   async selectItemById() {
     const { id } = this.ctx.query;
@@ -54,6 +54,24 @@ class UserController extends Controller {
         err: 10001,
         msg: 'OK!'
       }
+    }
+  }
+
+  async changeUserPassword() {
+    const { id, newPassword } = this.ctx.query;
+    await this.ctx.service.user.update({password: newPassword}, { where: { id }});
+    this.ctx.body = {
+      err: 10001,
+      msg: 'OK!'
+    }
+  }
+
+  async deleteAccount() {
+    const { account } = this.ctx.query;
+    await this.ctx.service.user.destroy({ where: { account }});
+    this.ctx.body = {
+      err: 10001,
+      msg: 'OK!'
     }
   }
 }

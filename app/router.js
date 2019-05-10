@@ -25,4 +25,5 @@ module.exports = app => {
   router.post('/user/confirmAccount', controller.user.confirmAccount);
   router.post('/user/changeUserAuth', controller.user.changeUserAuth);
   router.get('/user/getUserList', controller.user.getUserList);
+  router.post('/user/changeUserPassword', controller.user.changeUserPassword);
 };

@@ -10,6 +10,7 @@ module.exports = app => {
     created_at: DATE,
     updated_at: DATE,
     auth: STRING(30),
+    phone_number: STRING(30),
   });
 
   return User;

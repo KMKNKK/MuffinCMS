@@ -41,6 +41,14 @@ class UserService extends Service {
       return e;
     }
   }
+  async destroy(options) {
+    try {
+      await this.ctx.model.User.destroy(options);
+      return 'destroy OK!';
+    } catch(e) {
+      return e;
+    }
+  }
 }
 
 module.exports = UserService;
