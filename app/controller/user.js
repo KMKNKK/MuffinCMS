@@ -66,6 +66,15 @@ class UserController extends Controller {
     }
   }
 
+  async changeUserPhone() {
+    const { id, newPhone } = this.ctx.query;
+    await this.ctx.service.user.update({phone_number: newPhone}, { where: { id }});
+    this.ctx.body = {
+      err: 10001,
+      msg: 'OK!'
+    }
+  }
+
   async deleteAccount() {
     const { account } = this.ctx.query;
     await this.ctx.service.user.destroy({ where: { account }});

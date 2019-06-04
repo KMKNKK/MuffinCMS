@@ -26,4 +26,11 @@ module.exports = app => {
   router.post('/user/changeUserAuth', controller.user.changeUserAuth);
   router.get('/user/getUserList', controller.user.getUserList);
   router.post('/user/changeUserPassword', controller.user.changeUserPassword);
+  router.post('/user/changeUserPhone', controller.user.changeUserPhone);
+
+  router.post('/record/addItem', controller.record.addItem);
+  router.get('/record/getRecordList', controller.record.getRecordList);
+
+  router.post('/feedback/addItem', controller.feedback.addItem);
+  router.get('/feedback/getList', controller.feedback.getList);
 };
